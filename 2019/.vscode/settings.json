@@ -1,3 +1,4 @@
 {
-  "python.pythonPath": "/home/pete/.local/share/virtualenvs/2019-eio6V-9Y/bin/python"
+  "python.pythonPath": "/home/pete/.local/share/virtualenvs/2019-eio6V-9Y/bin/python",
+  "editor.detectIndentation": false
 }
