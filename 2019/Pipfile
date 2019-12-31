@@ -9,6 +9,7 @@ autopep8 = "*"
 rope = "*"
 
 [packages]
+pipetools = "*"
 
 [requires]
 python_version = "3.8"
