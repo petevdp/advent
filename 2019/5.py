@@ -19,6 +19,10 @@ class OPCode(Enum):
     multiply = 2
     prompt = 3
     output = 4
+    jump_if_true = 5
+    jump_if_false = 6
+    less_than = 7
+    equals = 8
     halt = 99
 
 
@@ -28,6 +32,10 @@ num_params = {
     2: 3,
     3: 1,
     4: 1,
+    5: 2,
+    6: 2,
+    7: 3,
+    8: 3,
     99: 0,
 }
 
@@ -56,26 +64,54 @@ class IntCode:
             val_b = self.read_param(ins.params[1])
             result = val_a + val_b
             self.write_param(ins.params[2], result)
-            next_position = ins.position + len(ins.params) + 1
+            next_position = self.next_instruction_position(ins)
 
         elif ins.opcode == OPCode.multiply.value:
             val_a = self.read_param(ins.params[0])
             val_b = self.read_param(ins.params[1])
             result = val_a * val_b
             self.write_param(ins.params[2], result)
-            next_position = ins.position + len(ins.params) + 1
+            next_position = self.next_instruction_position(ins)
 
         elif ins.opcode == OPCode.prompt.value:
             inpt = int(input("please input something: "))
             self.write_param(ins.params[0], inpt)
-            next_position = ins.position + len(ins.params) + 1
+            next_position = self.next_instruction_position(ins)
 
         elif ins.opcode == OPCode.output.value:
             self.output_param(ins.params[0])
-            next_position = ins.position + len(ins.params) + 1
+            next_position = self.next_instruction_position(ins)
 
         elif ins.opcode == OPCode.halt.value:
             next_position = None
+
+        elif ins.opcode == OPCode.jump_if_true.value:
+            if self.read_param(ins.params[0]) != 0:
+                next_position = self.read_param(ins.params[1])
+            else:
+                next_position = self.next_instruction_position(ins)
+
+        elif ins.opcode == OPCode.jump_if_false.value:
+            if self.read_param(ins.params[0]) == 0:
+                next_position = self.read_param(ins.params[1])
+            else:
+                next_position = self.next_instruction_position(ins)
+
+        elif ins.opcode == OPCode.less_than.value:
+            a, b = (self.read_param(ins.params[0]),
+                    self.read_param(ins.params[1]))
+
+            is_less_than = 1 if a < b else 0
+            self.write_param(ins.params[2], is_less_than)
+            next_position = self.next_instruction_position(ins)
+
+        elif ins.opcode == OPCode.equals.value:
+            a, b = (self.read_param(ins.params[0]),
+                    self.read_param(ins.params[1]))
+            is_equal = 1 if a == b else 0
+            self.write_param(ins.params[2], is_equal)
+            next_position = self.next_instruction_position(ins)
+
         else:
             raise Exception(f'unknown op code: {ins.opcode}')
 
@@ -115,11 +151,23 @@ class IntCode:
 
         print(value)
 
+    """
+    get instruction position next to this one
+    """
+
+    def next_instruction_position(self, ins):
+        return ins.position + len(ins.params) + 1
+
 
 if __name__ == "__main__":
     input_register = load_input()
-    # print_pinut = [3, 0, 4, 0, 99]
-    # multiply = [1002, 4, 3, 4, 33]
-    # add = [1101, 100, -1, 4, 0]
+
+    # test programs
+    print_pinut = [3, 0, 4, 0, 99]
+    multiply = [1002, 4, 3, 4, 33]
+    add = [1101, 100, -1, 4, 0]
+    is_true_immediate = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1]
+    is_true_position = [3, 12, 6, 12, 15, 1,
+                        13, 14, 13, 4, 13, 99, -1, 0, 1, 9]
     computer = IntCode(input_register)
     computer.run()
