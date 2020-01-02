@@ -102,13 +102,45 @@ class IntCode
 
             return adjacent_instruction_position instruction
 
+        when OpCode::JUMP_IF_TRUE
+            predicate_param, position_to_jump_to = instruction.params
+
+            if read_param(predicate_param) != 0
+                return read_param(position_to_jump_to)
+            end
+
+            return adjacent_instruction_position instruction
+
+        when OpCode::JUMP_IF_FALSE
+            predicate_param, position_to_jump_to = instruction.params
+
+            if read_param(predicate_param) == 0
+                return read_param(position_to_jump_to)
+            end
+
+            return adjacent_instruction_position instruction
+
+        when OpCode::LESS_THAN
+            param_a, param_b, write_position = instruction.params
+            a, b = [param_a, param_b].map { |p| read_param(p) }
+            result = a < b ? 1 : 0
+            write_param(write_position, result)
+
+            return adjacent_instruction_position instruction
+
+        when OpCode::EQUALS
+            param_a, param_b, write_position = instruction.params
+            a, b = [param_a, param_b].map { |p| read_param(p) }
+            result = a == b ? 1 : 0
+            write_param(write_position, result)
+
+            return adjacent_instruction_position instruction
+
         when OpCode::HALT
             return nil
         end
 
         raise "unknown opcode #{opcode}"
-
-        @position = next_position
     end
 
     def parse_instruction position
