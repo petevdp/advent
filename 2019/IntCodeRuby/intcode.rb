@@ -70,17 +70,17 @@ class IntCode
 
     # execute instruction, and return the next instruction pointer
     def execute_instruction instruction
-        puts instruction
-        if instruction.opcode == OpCode::SUM
+        case instruction.opcode
+        when OpCode::SUM
             param_a, param_b, output_location = instruction.params
             value_a = read_param(param_a)
             value_b = read_param(param_b)
             result = value_a + value_b
             write_param(output_location, result)
-            return adjacent_instruction_position instruction
-        end
 
-        if instruction.opcode == OpCode::PRODUCT
+            return adjacent_instruction_position instruction
+
+        when OpCode::PRODUCT
             param_a, param_b, write_location = instruction.params
             value_a = read_param(param_a)
             value_b = read_param(param_b)
@@ -88,24 +88,21 @@ class IntCode
             write_param(write_location, result)
 
             return adjacent_instruction_position instruction
-        end
 
-        if instruction.opcode == OpCode::INPUT
+        when OpCode::INPUT
             puts "input"
             input = @inputs.shift()
             write_location = instruction.params[0]
             write_param(write_location, input)
 
             return adjacent_instruction_position instruction
-        end
 
-        if instruction.opcode == OpCode::OUTPUT
+        when OpCode::OUTPUT
             output_param(instruction.params[0])
 
             return adjacent_instruction_position instruction
-        end
 
-        if instruction.opcode == OpCode::HALT
+        when OpCode::HALT
             return nil
         end
 
