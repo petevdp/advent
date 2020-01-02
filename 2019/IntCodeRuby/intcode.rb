@@ -20,8 +20,8 @@ end
 class OpCode
     include Ruby::Enum
 
-    define :ADD, 1
-    define :IMMEDIATE, 2
+    define :SUM, 1
+    define :PRODUCT, 2
     define :GET_INPUT, 3
     define :OUTPUT, 4
     define :JUMP_IF_TRUE, 5
@@ -61,6 +61,7 @@ class IntCode
         while @curr_position != nil
             instruction = parse_instruction @curr_position
             @curr_position = execute_instruction instruction
+            puts "new location: #{@curr_position}"
         end
         @outputs
     end
@@ -70,12 +71,24 @@ class IntCode
     # execute instruction, and return the next instruction pointer
     def execute_instruction instruction
         puts instruction
-        if instruction.opcode == OpCode::ADD
+        if instruction.opcode == OpCode::SUM
             param_a, param_b, output_location = instruction.params
             value_a = read_param(param_a)
             value_b = read_param(param_b)
             result = value_a + value_b
             write_param(output_location, result)
+            return adjacent_instruction instruction
+        end
+
+        if instruction.opcode == OpCode::PRODUCT
+            param_a, param_b, output_location = instruction.params
+            value_a = read_param(param_a)
+            value_b = read_param(param_b)
+            puts "value_a: #{value_a}"
+            puts "value_b: #{value_b}"
+            result = value_a * value_b
+            write_param(output_location, result)
+
             return adjacent_instruction instruction
         end
 
@@ -106,27 +119,19 @@ class IntCode
             .zip(modes)
             .map { |input, mode| Param.new(input, mode) }
 
-        puts "code: #{code}"
-        puts "inputs: #{inputs}"
-        puts "modes: #{modes}"
-        puts inputs
-
-        i = Instruction.new(position, opcode, params)
-        puts "instruction: #{i}"
-        i
+        Instruction.new(position, opcode, params)
     end
 
     def read_param param
-        if param.mode == Mode::IMMEDIATE
-            return param.input
-        end
-
         if param.mode == Mode::POSITION
             return @register[param.input]
         end
 
-        raise "unknown mode #{param.mode}"
+        if param.mode == Mode::IMMEDIATE
+            return param.input
+        end
 
+        raise "unknown mode #{param.mode}"
     end
 
     def write_param location_param, value
@@ -134,6 +139,6 @@ class IntCode
     end
 
     def adjacent_instruction instruction
-        return instruction.position + intruction.params + 1
+        return instruction.position + instruction.params.length + 1
     end
 end
