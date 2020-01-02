@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.0)
+    awesome_print (1.8.0)
     backport (1.1.2)
     benchmark (0.1.0)
     coderay (1.1.2)
@@ -111,6 +112,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   debase
   guard-rspec
   rspec

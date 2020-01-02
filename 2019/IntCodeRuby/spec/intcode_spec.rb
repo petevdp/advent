@@ -1,7 +1,8 @@
 require_relative '../intcode'
 
 RSpec.describe IntCode, '#run' do
-    it "it can sum numbers" do
+
+    it "it can sum numbers", do
         summing_program = [1,2,2, 0, 99] # add 2 + 2, store at position 0 and exit
         sum = 4
         computer = IntCode.new(summing_program, [])
