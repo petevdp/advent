@@ -139,8 +139,7 @@ class IntCode:
         if param.mode == Mode.position.value:
             return self.register[param.input]
 
-        else:
-            raise Exception(f'Mode {param.mode} does not exist.')
+        raise Exception(f'Mode {param.mode} does not exist.')
 
     def write_param(self, param, value):
         self.register[param.input] = value
@@ -179,8 +178,8 @@ class AmplificationCircuit:
         return output[0]
 
 
-def find_best_phase_settings(program):
-    possible_phase_settings = [*permutations(range(0, 5))]
+def find_best_phase_settings(program, phase_setting_range):
+    possible_phase_settings = [*permutations(phase_setting_range))]
     print(f'checking {len(possible_phase_settings)}possible phase settings')
     max_output = float('-inf')
     max_input_settings = None
@@ -205,4 +204,4 @@ if __name__ == "__main__":
 3,23,3,24,1002,24,10,24,1002,23,-1,23,
 101,5,23,23,1,24,23,23,4,23,99,0,0
     ]
-    print(find_best_phase_settings(input_program))
+    print(find_best_phase_settings(input_program, range(5, 10)))

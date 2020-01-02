@@ -25,8 +25,16 @@ RSpec.describe IntCode, '#run' do
         multiplication_program = [1102, 2,5, 0, 99] # add 2 + 2, store at position 0 and exit
         product = 10
         computer = IntCode.new(multiplication_program, [])
-        computer.run()
+        computer.run
 
         expect(computer.register[0]).to eq(product)
+    end
+
+    it "can receive input and emit output" do
+        num = 40
+        computer = IntCode.new([3,0,4,0,99], [num])
+        computer.run
+
+        expect(computer.outputs[0]).to eq(num)
     end
 end

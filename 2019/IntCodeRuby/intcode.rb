@@ -22,7 +22,7 @@ class OpCode
 
     define :SUM, 1
     define :PRODUCT, 2
-    define :GET_INPUT, 3
+    define :INPUT, 3
     define :OUTPUT, 4
     define :JUMP_IF_TRUE, 5
     define :JUMP_IF_FALSE, 6
@@ -77,26 +77,39 @@ class IntCode
             value_b = read_param(param_b)
             result = value_a + value_b
             write_param(output_location, result)
-            return adjacent_instruction instruction
+            return adjacent_instruction_position instruction
         end
 
         if instruction.opcode == OpCode::PRODUCT
-            param_a, param_b, output_location = instruction.params
+            param_a, param_b, write_location = instruction.params
             value_a = read_param(param_a)
             value_b = read_param(param_b)
-            puts "value_a: #{value_a}"
-            puts "value_b: #{value_b}"
             result = value_a * value_b
-            write_param(output_location, result)
+            write_param(write_location, result)
 
-            return adjacent_instruction instruction
+            return adjacent_instruction_position instruction
+        end
+
+        if instruction.opcode == OpCode::INPUT
+            puts "input"
+            input = @inputs.shift()
+            write_location = instruction.params[0]
+            write_param(write_location, input)
+
+            return adjacent_instruction_position instruction
+        end
+
+        if instruction.opcode == OpCode::OUTPUT
+            output_param(instruction.params[0])
+
+            return adjacent_instruction_position instruction
         end
 
         if instruction.opcode == OpCode::HALT
             return nil
         end
 
-        raise "unknown opcode #opcode"
+        raise "unknown opcode #{opcode}"
 
         @position = next_position
     end
@@ -106,6 +119,7 @@ class IntCode
         opcode = code % 100 # get last two digits
         inputs = @register[position + 1..(position + $NUM_PARAMS[opcode])]
 
+        # append implicit 0s to left over inputs
         explicit_str_code = "0" * (inputs.length - (code.to_s.length - 2)) + code.to_s
 
         modes = explicit_str_code
@@ -135,10 +149,24 @@ class IntCode
     end
 
     def write_param location_param, value
-        @register[location_param.input] = value
+        input = location_param.input
+        @register[input] = value
     end
 
-    def adjacent_instruction instruction
+    def output_param param
+        if param.mode == Mode::IMMEDIATE
+            value = param.input
+        elsif param.mode == Mode::POSITION
+            value = @register[param.input]
+        else
+            raise "mode #{param.mode} does not exist"
+        end
+
+        @outputs.append(value)
+    end
+
+    # get the position of the next instruction to the left
+    def adjacent_instruction_position instruction
         return instruction.position + instruction.params.length + 1
     end
 end

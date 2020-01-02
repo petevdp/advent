@@ -5,6 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Ruby: Debug Local File",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "${file}"
+    },
+
+    {
       "name": "Python: Current File",
       "type": "python",
       "request": "launch",
