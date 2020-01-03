@@ -164,7 +164,7 @@ class AmplificationCircuit:
     def __init__(self, phase_settings, start_value, program):
         self.program = program
         self.phase_settings = phase_settings
-        self.starting_input = 0
+        self.starting_input = start_value
 
     def run(self):
         return reduce(self.amplify, self.phase_settings, self.starting_input)

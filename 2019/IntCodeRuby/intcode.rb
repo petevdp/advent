@@ -61,7 +61,6 @@ class IntCode
         while @curr_position != nil
             instruction = parse_instruction @curr_position
             @curr_position = execute_instruction instruction
-            puts "new location: #{@curr_position}"
         end
         @outputs
     end
@@ -90,7 +89,6 @@ class IntCode
             return adjacent_instruction_position instruction
 
         when OpCode::INPUT
-            puts "input"
             input = @inputs.shift()
             write_location = instruction.params[0]
             write_param(write_location, input)
@@ -146,9 +144,9 @@ class IntCode
     def parse_instruction position
         code = @register[position]
         opcode = code % 100 # get last two digits
-        inputs = @register[position + 1..(position + $NUM_PARAMS[opcode])]
+        inputs = @register[(position + 1)..(position + $NUM_PARAMS[opcode])]
 
-        # append implicit 0s to left over inputs
+        # append implicit 0s to left
         explicit_str_code = "0" * (inputs.length - (code.to_s.length - 2)) + code.to_s
 
         modes = explicit_str_code

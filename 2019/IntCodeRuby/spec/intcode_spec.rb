@@ -44,7 +44,6 @@ RSpec.describe IntCode, '#run' do
         it "outputs 1 with true input" do
             computer = IntCode.new(is_input_true_program, [1])
             computer.run
-            puts "outputs: #{computer.outputs}"
             expect(computer.outputs[0]).to eq(1)
         end
 
