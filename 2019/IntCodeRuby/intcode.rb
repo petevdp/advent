@@ -1,15 +1,5 @@
 require "ruby-enum"
 
-def load_input(location="7_amplification_circuit/input.txt")
-    file = File.open(location)
-    text = file.read
-    file.close
-
-    text
-        .split(',')
-        .map { |str| str.to_i }
-end
-
 class Mode
     include Ruby::Enum
 
@@ -49,8 +39,9 @@ Instruction = Struct.new(:position, :opcode, :params)
 
 class IntCode
     attr_reader :register, :outputs, :curr_position
+    attr_accessor :inputs
 
-    def initialize(starting_register, inputs)
+    def initialize(starting_register, inputs=[])
         @register = starting_register
         @curr_position = 0
         @inputs = inputs
@@ -58,11 +49,43 @@ class IntCode
     end
 
     def run
-        while @curr_position != nil
+        if halted?
+            raise ProgramIsHaltedError
+        end
+
+        while !halted?
             instruction = parse_instruction @curr_position
             @curr_position = execute_instruction instruction
         end
+
         @outputs
+    end
+
+    def run_until_output_or_halt
+        if halted?
+            raise ProgramIsHaltedError
+        end
+
+        while (!halted?) && (@outputs.empty?)
+            instruction = parse_instruction @curr_position
+            @curr_position = execute_instruction instruction
+        end
+
+        # either return the output or nil if none was provided
+
+        if halted?
+            return :halted
+        end
+
+        if outputs.empty?
+            raise "wtf"
+        end
+
+        @outputs.pop()
+    end
+
+    def halted?
+        @curr_position == nil
     end
 
     private
@@ -89,6 +112,9 @@ class IntCode
             return adjacent_instruction_position instruction
 
         when OpCode::INPUT
+            if @inputs.empty?
+                raise "inputs is empty!"
+            end
             input = @inputs.shift()
             write_location = instruction.params[0]
             write_param(write_location, input)
@@ -97,7 +123,6 @@ class IntCode
 
         when OpCode::OUTPUT
             output_param(instruction.params[0])
-
             return adjacent_instruction_position instruction
 
         when OpCode::JUMP_IF_TRUE
@@ -196,4 +221,8 @@ class IntCode
     def adjacent_instruction_position instruction
         return instruction.position + instruction.params.length + 1
     end
+
+end
+
+class ProgramIsHaltedError < StandardError
 end
