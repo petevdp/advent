@@ -12,14 +12,6 @@ def load_input(day)
 end
 
 
-module Solutions
-
-    def s_7_1 input
-    end
-
-end
-
-
 if __FILE__ == $0
     problem = ARGV[0]
     day = problem[0]
@@ -29,7 +21,7 @@ if __FILE__ == $0
     when '7-1'
         result = find_max_thruster_signal(input)
     when '7-2'
-        result = find_max_thruster_signal(input, true)
+        result = find_max_thruster_signal(input, true) #turn on feedback loop
     else
         raise "invalid problem #{problem}"
     end
