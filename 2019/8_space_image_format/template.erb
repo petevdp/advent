@@ -1,0 +1,40 @@
+<section class="picture">
+    <% @pixels.each do |pixel| %>
+        <span class="pixel colour<%= pixel.to_s %>"></span>
+    <% end %>
+</section>
+
+<style>
+
+
+body {
+    background-color: grey;
+}
+
+.picture {
+    display: grid;
+
+    grid-template-columns: repeat(<%= $WIDTH %>, auto);
+    grid-template-rows: repeat(<%= $HEIGHT %>, auto);
+    height: 150px;
+    width: 500px;
+}
+
+.row {
+    width: 100%;
+}
+
+/* .pixel {
+    width: 5px;
+    height: 5px;
+} */
+
+.colour0 {
+    background-color: black;
+}
+
+.colour1 {
+    background-color: white;
+}
+
+</style>
