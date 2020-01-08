@@ -94,4 +94,31 @@ RSpec.describe IntCode, '#run' do
             expect(computer.outputs[0]).to eq(0)
         end
     end
+
+    describe "booster_day_9" do
+        it "can quine", :focus do
+            program = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
+            expected_output = program
+            computer = IntCode.new(program, [])
+            computer.run()
+            expect(computer.outputs).to eq(expected_output)
+        end
+
+        it "can 16 digit" do
+            program = [1102,34915192,34915192,7,4,7,99,0]
+            expected_output = program
+            computer = IntCode.new(program, [])
+            computer.run()
+            c_output = computer.outputs[0].to_s.length
+            expect(c_output).to eq(16)
+        end
+
+        it "outputs the large number" do
+            program = [104,1125899906842624,99]
+            output = program[1]
+            computer = IntCode.new(program, [])
+            computer.run()
+            expect(computer.outputs[0]).to eq(output)
+        end
+    end
 end

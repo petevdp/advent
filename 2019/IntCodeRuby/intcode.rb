@@ -5,6 +5,7 @@ class Mode
 
     define :POSITION, 0
     define :IMMEDIATE, 1
+    define :RELATIVE, 2
 end
 
 class OpCode
@@ -18,6 +19,7 @@ class OpCode
     define :JUMP_IF_FALSE, 6
     define :LESS_THAN, 7
     define :EQUALS, 8
+    define :ADJUST_RELATIVE_BASE, 9
     define :HALT, 99
 end
 
@@ -46,6 +48,7 @@ class IntCode
         @curr_position = 0
         @inputs = inputs
         @outputs = []
+        @relative_base = 0
     end
 
     def run
@@ -159,6 +162,12 @@ class IntCode
 
             return adjacent_instruction_position instruction
 
+        when OpCode::ADJUST_RELATIVE_BASE
+            param = instruction.params[0]
+            @relative_base += read_param(param)
+
+            return adjacent_instruction_position instruction
+
         when OpCode::HALT
             return nil
         end
@@ -195,6 +204,10 @@ class IntCode
 
         if param.mode == Mode::IMMEDIATE
             return param.input
+        end
+
+        if param.mode == Mode::RELATIVE
+            return @relative_base + param.input
         end
 
         raise "unknown mode #{param.mode}"
