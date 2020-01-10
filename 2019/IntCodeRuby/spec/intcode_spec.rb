@@ -96,7 +96,7 @@ RSpec.describe IntCode, '#run' do
     end
 
     describe "booster_day_9" do
-        it "can quine", :focus do
+        it "can quine" do
             program = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
             expected_output = program
             computer = IntCode.new(program, [])
@@ -119,6 +119,15 @@ RSpec.describe IntCode, '#run' do
             computer = IntCode.new(program, [])
             computer.run()
             expect(computer.outputs[0]).to eq(output)
+        end
+
+
+        it "supports the usage of relative bases" do
+            program = [109, 7, 204, 1, 99] + ([nil] * 3) + [20]
+            computer = IntCode.new(program, [])
+            computer.run()
+            expect(computer.outputs[0]).to eq(20)
+
         end
     end
 end

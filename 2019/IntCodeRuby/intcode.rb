@@ -2,7 +2,6 @@ require "ruby-enum"
 
 class Mode
     include Ruby::Enum
-
     define :POSITION, 0
     define :IMMEDIATE, 1
     define :RELATIVE, 2
@@ -33,6 +32,7 @@ $NUM_PARAMS = {
     6 => 2,
     7 => 3,
     8 => 3,
+    9 => 1,
     99 => 0,
 }
 
@@ -44,9 +44,9 @@ class IntCode
     attr_accessor :inputs
 
     def initialize(starting_register, inputs=[])
-        @register = starting_register
+        @register = starting_register.dup
         @curr_position = 0
-        @inputs = inputs
+        @inputs = inputs.dup
         @outputs = []
         @relative_base = 0
     end
@@ -81,7 +81,7 @@ class IntCode
         end
 
         if outputs.empty?
-            raise "wtf"
+            raise "something went wrong with the while loop"
         end
 
         @outputs.pop()
@@ -178,7 +178,11 @@ class IntCode
     def parse_instruction position
         code = @register[position]
         opcode = code % 100 # get last two digits
-        inputs = @register[(position + 1)..(position + $NUM_PARAMS[opcode])]
+        instruction_range = (position + 1)..(position + $NUM_PARAMS[opcode])
+        inputs = instruction_range.map do |i|
+            # check for a value at that position, else give zero
+            @register[i] || 0
+        end
 
         # append implicit 0s to left
         explicit_str_code = "0" * (inputs.length - (code.to_s.length - 2)) + code.to_s
@@ -198,23 +202,31 @@ class IntCode
     end
 
     def read_param param
-        if param.mode == Mode::POSITION
-            return @register[param.input]
-        end
-
         if param.mode == Mode::IMMEDIATE
             return param.input
         end
 
-        if param.mode == Mode::RELATIVE
-            return @relative_base + param.input
+        if param.mode == Mode::POSITION
+            value = @register[param.input]
+        elsif param.mode == Mode::RELATIVE
+            value = @register[@relative_base + param.input]
+        else
+            raise "unknown mode #{param.mode}"
         end
 
-        raise "unknown mode #{param.mode}"
+        value || 0
     end
 
     def write_param location_param, value
-        input = location_param.input
+        case location_param.mode
+        when Mode::RELATIVE
+            input = @relative_base + location_param.input
+        when Mode::POSITION
+            input = location_param.input
+        else
+            raise "unsupported mode #{location_param.mode} for writing"
+        end
+
         @register[input] = value
     end
 
@@ -223,6 +235,8 @@ class IntCode
             value = param.input
         elsif param.mode == Mode::POSITION
             value = @register[param.input]
+        elsif param.mode == Mode::RELATIVE
+            value = @register[@relative_base + param.input]
         else
             raise "mode #{param.mode} does not exist"
         end

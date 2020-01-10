@@ -7,13 +7,10 @@ GEM
     benchmark (0.1.0)
     coderay (1.1.2)
     concurrent-ruby (1.1.5)
-    curses (1.3.2)
     debase (0.2.4.1)
       debase-ruby_core_source (>= 0.10.2)
     debase-ruby_core_source (0.10.9)
     diff-lcs (1.3)
-    drawille (0.3.3)
-      curses
     e2mmap (0.1.0)
     ffi (1.11.3)
     formatador (0.2.5)
@@ -117,7 +114,6 @@ PLATFORMS
 DEPENDENCIES
   awesome_print
   debase
-  drawille
   guard-rspec
   rspec
   ruby-debug-ide

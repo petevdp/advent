@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require_relative "amplification_circuit"
 require_relative "intcode"
 
@@ -22,6 +24,10 @@ if __FILE__ == $0
         result = find_max_thruster_signal(input)
     when '7-2'
         result = find_max_thruster_signal(input, true) #turn on feedback loop
+    when '9-1'
+        computer = IntCode.new(input, [1])
+        computer.run
+        result = computer.outputs
     else
         raise "invalid problem #{problem}"
     end
