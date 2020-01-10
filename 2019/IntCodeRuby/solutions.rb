@@ -28,6 +28,10 @@ if __FILE__ == $0
         computer = IntCode.new(input, [1])
         computer.run
         result = computer.outputs
+    when '9-2'
+        computer = IntCode.new(input, [2])
+        computer.run
+        result = computer.outputs
     else
         raise "invalid problem #{problem}"
     end
