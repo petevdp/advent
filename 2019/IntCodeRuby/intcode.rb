@@ -23,7 +23,7 @@ class OpCode
 end
 
 # how many paramaters each opcode is expecting
-$NUM_PARAMS = {
+NUM_PARAMS = {
     1 => 3,
     2 => 3,
     3 => 1,
@@ -64,13 +64,13 @@ class IntCode
         @outputs
     end
 
-    def run_until_output_or_halt
+    def run_until_output_or_halt(num_expected_outputs=1)
         if halted?
             raise ProgramIsHaltedError
         end
 
-        while (!halted?) && (@outputs.empty?)
-            instruction = parse_instruction @curr_position
+        while (!halted?) && (@outputs.length < num_expected_outputs)
+            instruction = parse_instruction(@curr_position)
             @curr_position = execute_instruction instruction
         end
 
@@ -84,7 +84,7 @@ class IntCode
             raise "something went wrong with the while loop"
         end
 
-        @outputs.pop()
+        @outputs.pop(num_expected_outputs)
     end
 
     def halted?
@@ -176,9 +176,13 @@ class IntCode
     end
 
     def parse_instruction position
+        puts "position: #{position}"
         code = @register[position]
         opcode = code % 100 # get last two digits
-        instruction_range = (position + 1)..(position + $NUM_PARAMS[opcode])
+        puts "opcode: #{opcode}"
+        puts opcode.class
+        puts NUM_PARAMS[opcode]
+        instruction_range = (position + 1)..(position + NUM_PARAMS[opcode])
         inputs = instruction_range.map do |i|
             # check for a value at that position, else give zero
             @register[i] || 0
