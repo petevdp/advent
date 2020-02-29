@@ -66,7 +66,8 @@ def load_input(path="./input")
     f = open(path, 'r')
     text = f.read()
     f.close
-    return text
+
+    text
 end
 
 def get_all_coords(dimensions)

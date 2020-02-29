@@ -11,6 +11,7 @@ convert to absolute, compare slope ratio
 
 station = [26, 36]
 
+
 def order_in_sequence_destroyed(outpost, asteroids)
     asteroids_without_outpost = asteroids.select {|a| a != outpost}
     centered_coords = center_coords_around_point(outpost, asteroids_without_outpost)
@@ -20,7 +21,6 @@ def order_in_sequence_destroyed(outpost, asteroids)
     end
 
     ordered_coords = []
-    # puts "double: #{(slope_groups.values.select {|g| g.length == 2 }).count}"
     while slopes.length > 0
         slopes
             .each do |slope| 
@@ -36,32 +36,31 @@ def order_in_sequence_destroyed(outpost, asteroids)
     end
 end
 
-
 def sort_slopes(slopes)
     # quadrants
     quadrants = [
         # q1
-        slopes.select {|s| s[0] > 0 and s[1] > 0},
-        # q2
         slopes.select {|s| s[0] < 0 and s[1] > 0},
+        # q2
+        slopes.select {|s| s[0] > 0 and s[1] > 0},
         # q3
-        slopes.select {|s| s[0] < 0 and s[1] < 0},
-        # q4
         slopes.select {|s| s[0] > 0 and s[1] < 0},
+        # q4
+        slopes.select {|s| s[0] < 0 and s[1] < 0},
     ]
 
-    quadrants.map.with_index do |q, i|
+    quadrants = quadrants.map.with_index do |q, i|
         sort_quadrant_slopes_ascending(q, i % 2 != 0)
     end
 
     q1, q2, q3, q4 = quadrants
 
     [
-        [1, 0],
+        [-1, 0],
         *q1,
         [0, 1],
         *q2,
-        [-1, 0],
+        [1, 0],
         *q3,
         [0, -1],
         *q4
@@ -73,14 +72,12 @@ def flip_coords(coords)
 end
 
 
-def sort_quadrant_slopes_ascending(slopes, is_q2_or_q4)
+def sort_quadrant_slopes_ascending(slopes, is_odd_quarter)
     sorted = slopes.sort_by do |coord| 
         x, y = coord
         -(coord[0].abs.to_f / coord[1].abs.to_f)
     end
-
-    # if we're sorting q2 or q4, we have to flip the order
-    sorted.reverse ? is_q2_or_q4 : sorted
+    is_odd_quarter ? sorted.reverse : sorted
 end
 
 
@@ -123,49 +120,46 @@ end
 
 
 def paint_sequence(asteroid_seq, input_path)
-    alphabet = ("a".."z").to_a
-    if asteroid_seq.length > alphabet.length
-        raise "sequence too long! should be at most 26"
-    end
+    alphabet = ((("a".."z").to_a) + (("A".."Z").to_a))
 
     text = load_input(input_path)
-    # puts "lines:  #{lines}"
-    # puts "len: #{lines.length}"
-    asteroid_seq.each_with_index do |coord, index|
-        text = paint_coord(coord, alphabet[index], text)
+    alphabet.each_with_index do |char, index|
+        text = paint_coord(asteroid_seq[index], char, text)
     end
 
     text
 end
 
 def paint_slope_groups(groups, text)
-    alphabet = ("a".."z").to_a
+    alphabet = ((("a".."z").to_a) + (("A".."Z").to_a))
     text = text.dup
 
-    slopes = groups.keys
-
-    puts "len: #{slopes.length}"
+    slopes = sort_slopes(groups.keys)
 
     alphabet.each_with_index do |char, index|
         slope = slopes[index]
-        puts "#{alphabet[index]}: #{slope.join(",")}"
+        if not slope
+            return text
+        end
         group = groups[slope]
+        puts "#{alphabet[index]}: #{slope.join(",")} (#{group.length})"
         group.each do |coord|
             text = paint_coord(coord, char, text)
         end
     end
-    puts text
+    text
 end
 
 def paint_coord(coord, char, text)
-    lines = text.split("\n")
-    puts "coord: #{coord}"
-    puts "lines: #{lines.length}"
+    lines = text.split
     i, j = coord
     line = lines[i]
-    line[j]
+    if line[j] != "#"
+        raise "painting on non asteroid: #{coord}"
+    end
+    line[j] = char
 
-    lines.join('\n')
+    lines.join("\n")
 end
 
 
@@ -186,18 +180,15 @@ end
 
 def paint_slopes
     input_path = "./test_inputs/4"
+    outpost = [13, 11]
     dims, asteroids = get_dimensions_and_asteroids(input_path)
-    outpost = [10, 12]
-    centered_asteroids = center_coords_around_point(outpost, asteroids)
+    asteroids_without_outpost = asteroids.select {|a| a != outpost }
+    centered_asteroids = center_coords_around_point(outpost, asteroids_without_outpost)
     centered_groups = get_slope_groups(centered_asteroids)
     groups = {}
 
     centered_groups.entries.each do |slope, group|
-        puts "slope: #{slope}"
-        puts "group: #{group}"
         groups[slope] = uncenter_coords(outpost, group)
-        puts "uncentered: #{groups[slope]}"
-
         out_of_bounds = groups[slope].select do |coord|
             i, j = coord
             i_len, j_len = dims
@@ -209,12 +200,24 @@ def paint_slopes
         end
     end
 
-    puts "dims: #{dims}"
+    puts "outpost: #{outpost}"
 
     text = load_input(input_path)
-    paint_slope_groups(groups, text)
+
+    text = paint_coord(outpost, "&", text)
+    puts paint_slope_groups(groups, text)
+end
+
+def main
+    input_path = "./input"
+    outpost = [36, 26]
+    _, asteroids = get_dimensions_and_asteroids(input_path)
+
+    coord = order_in_sequence_destroyed(outpost, asteroids)[199]
+
+    puts((coord[1] * 100) + coord[0])
 end
 
 if __FILE__ == $0
-    paint_slopes
+    main
 end
