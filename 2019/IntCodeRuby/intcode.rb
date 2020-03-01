@@ -176,12 +176,8 @@ class IntCode
     end
 
     def parse_instruction position
-        puts "position: #{position}"
         code = @register[position]
         opcode = code % 100 # get last two digits
-        puts "opcode: #{opcode}"
-        puts opcode.class
-        puts NUM_PARAMS[opcode]
         instruction_range = (position + 1)..(position + NUM_PARAMS[opcode])
         inputs = instruction_range.map do |i|
             # check for a value at that position, else give zero

@@ -34,21 +34,13 @@ CARDINAL_DELTA_MAP = {
     west: [0,1],
 }
 
-def main
-    puts get_num_painted_tiles
-end
-
-
-def get_num_painted_tiles
+def get_tile_colors(tile_colors={})
     input = load_input
     computer = IntCode.new(input)
-
-    tile_colors = {}
     curr_coord = [0,0]
     curr_cardinal = :north
     loop do 
         curr_color = tile_colors[curr_coord] || 0
-        puts "curr_color: #{curr_color}"
         computer.inputs.push(curr_color)
         output = computer.run_until_output_or_halt(2)
         if output == :halted
@@ -66,7 +58,7 @@ def get_num_painted_tiles
         curr_coord = curr_coord.zip(delta).map { |dim_pair| dim_pair.sum }
     end
 
-    (Set[*tile_colors]).length
+    tile_colors
 end
 
 
@@ -78,5 +70,5 @@ def load_input(path="./input")
 end
 
 if __FILE__ == $0
-    main
+    puts get_tile_colors.length
 end
