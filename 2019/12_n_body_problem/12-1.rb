@@ -8,21 +8,22 @@
 =end
 
 def main
-    simulate(1000)
+    moons = {a: {pos: {x: 5}, vel: {x:0}}, b: {pos: {x: 2}, vel: {x:0}}}
+    simulate(100, moons, [:x])
 end
 
-def simulate(cycles) 
-    moons = {
-        a: {pos: {x:-15, y:  1, z: 4}, vel: {x: 0, y: 0, z: 0}},
-        b: {pos: {x:  1, y:-10, z:-8}, vel: {x: 0, y: 0, z: 0}},
-        c: {pos: {x: -5, y:  4, z: 9}, vel: {x: 0, y: 0, z: 0}},
-        d: {pos: {x:  4, y:  6, z:-2}, vel: {x: 0, y: 0, z: 0}},
-    }
+MOONS = {
+    a: {pos: {x:-15, y:  1, z: 4}, vel: {x: 0, y: 0, z: 0}},
+    b: {pos: {x:  1, y:-10, z:-8}, vel: {x: 0, y: 0, z: 0}},
+    c: {pos: {x: -5, y:  4, z: 9}, vel: {x: 0, y: 0, z: 0}},
+    d: {pos: {x:  4, y:  6, z:-2}, vel: {x: 0, y: 0, z: 0}},
+}
 
+def simulate(cycles, moons=MOONS, dims=[:x,:y,:z]) 
     cycles.times.each do |step|
-        apply_gravity(moons)
-        apply_velocity(moons)
-        puts "#{total_energy(moons)} (#{step + 1})"
+        apply_gravity(moons, dims)
+        apply_velocity(moons, dims)
+        puts("#{total_energy(moons)} (#{step + 1})")
     end
 end
 
@@ -46,7 +47,7 @@ def kinetic_energy(moon)
         .sum
 end
 
-def apply_gravity(moons)
+def apply_gravity(moons, dims)
     vel_deltas = {}
     moons.keys.each {|k| vel_deltas[k] = {x: 0, y: 0, z: 0}}
 
@@ -57,7 +58,7 @@ def apply_gravity(moons)
         a,b = pair
         a_key, a_val = a
         b_key, b_val = b
-        [:x,:y,:z].each do |dim|
+        dims.each do |dim|
             case a_val[:pos][dim] <=> b_val[:pos][dim]
             when 1
                 vel_deltas[a_key][dim] -= 1
@@ -71,22 +72,21 @@ def apply_gravity(moons)
 
     # apply deltas
     moons.keys.each do |k|
-        [:x,:y,:z].each do |dim|
+        dims.each do |dim|
             moons[k][:vel][dim] += vel_deltas[k][dim]
         end
     end
 end
 
-def apply_velocity(moons)
+def apply_velocity(moons, dims)
     moons.values.each do |moon|
-        [:x, :y, :z].each do |dim|
+        dims.each do |dim|
             moon[:pos][dim] += moon[:vel][dim]
         end
     end
 
     moons
 end
-
 
 if __FILE__ == $0
     main
