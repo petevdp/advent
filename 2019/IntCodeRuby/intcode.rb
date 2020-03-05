@@ -43,12 +43,19 @@ class IntCode
     attr_reader :register, :outputs, :curr_position
     attr_accessor :inputs
 
-    def initialize(starting_register, inputs=[])
+    def initialize(
+            starting_register,
+            inputs=[],
+            on_input= nil,
+            on_output= nil
+        )
         @register = starting_register.dup
         @curr_position = 0
         @inputs = inputs.dup
         @outputs = []
         @relative_base = 0
+        @on_input = on_input
+        @on_output = on_output
     end
 
     def run
@@ -115,10 +122,14 @@ class IntCode
             return adjacent_instruction_position instruction
 
         when OpCode::INPUT
-            if @inputs.empty?
-                raise "inputs is empty!"
+            if @on_input
+                input = @on_input.call()
+            else
+                if @inputs.empty?
+                    raise "inputs is empty!"
+                end
+                input = @inputs.shift()
             end
-            input = @inputs.shift()
             write_location = instruction.params[0]
             write_param(write_location, input)
 
@@ -240,7 +251,9 @@ class IntCode
         else
             raise "mode #{param.mode} does not exist"
         end
-
+        if @on_output
+            @on_output.call(value)
+        end
         @outputs.append(value)
     end
 
