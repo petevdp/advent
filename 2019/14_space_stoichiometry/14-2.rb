@@ -11,25 +11,23 @@ def main
 
 
     ore_count = 1000000000000
-    fuel_count = 0
 
-    puts get_upper_bound(reactions, ore_count);
-end
+    upper = ore_count
+    lower = 0
 
-def get_upper_bound(reactions, available_ore)
-    fuel = available_ore
-    ore = Float::INFINITY
-
-    loop do
-        puts "fuel: #{fuel}"
-        ore_used = produce_fuel(reactions, fuel)
-
-        if ore_used < available_ore
-            return fuel;
+    while lower < upper
+        mid = ((upper - lower) / 2) + lower
+        ore_consumed = produce_fuel(reactions, mid)
+        if ore_consumed == ore_count
+            return mid
+        elsif ore_consumed > ore_count
+            upper = mid 
+        else
+            lower = mid + 1
         end
-        ore = ore_used
-        fuel -= 1
+        puts "upper: #{upper}, lower: #{lower}, mid: #{mid}, consumed: #{ore_consumed}"
     end
+    puts "end: #{mid}"
 end
 
 def produce_fuel(reactions, fuel_to_produce)
@@ -112,5 +110,5 @@ def hash_key hash
 end
 
 if __FILE__ == $0
-    main
+    puts main
 end
