@@ -2,7 +2,6 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.0)
-    awesome_print (1.8.0)
     backport (1.1.2)
     benchmark (0.1.0)
     coderay (1.1.2)
@@ -14,6 +13,9 @@ GEM
     e2mmap (0.1.0)
     ffi (1.11.3)
     formatador (0.2.5)
+    gosu (0.15.1)
+    gosu_grid (0.0.1)
+      gosu
     guard (2.16.1)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
@@ -112,8 +114,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  awesome_print
   debase
+  gosu
+  gosu_grid
   guard-rspec
   rspec
   ruby-debug-ide
