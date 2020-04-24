@@ -17,6 +17,21 @@ ADJ_DELTAS = [
     [0, 1],
 ]
 
+CARDINALS = {
+    west: [-1,0],
+    east: [1,0],
+    north: [-1,0],
+    south: [1,0]
+}
+
+# the order matters with these
+orientations = [
+    :north,
+    :south,
+    :east,
+    :west
+]
+
 def main
     computer = IntCode.new(load_input)
     output = computer.run

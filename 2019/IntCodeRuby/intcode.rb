@@ -71,6 +71,18 @@ class IntCode
         @outputs
     end
 
+    def run_until_input_or_halt(num_expected_inputs=1)
+        if halted?
+            raise ProgramIsHaltedError
+        end
+        puts "halted: #{halted?}"
+        puts "inputs: #{inputs.length}"
+        while (!halted?) && (@inputs.length > num_expected_inputs)
+            instruction = parse_instruction(@curr_position)
+            @curr_position = execute_instruction(instruction)
+        end
+    end
+
     def run_until_output_or_halt(num_expected_outputs=1)
         if halted?
             raise ProgramIsHaltedError
