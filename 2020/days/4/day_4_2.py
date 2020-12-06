@@ -94,12 +94,7 @@ VALIDATIONS = [
 
 
 def validate_passport(passport):
-    for validation in VALIDATIONS:
-        if not validation(passport):
-            return False
-    return True
+    return all(validation(passport) for validation in VALIDATIONS)
 
-
-# print(passports)
 if __name__ == '__main__':
     main()
