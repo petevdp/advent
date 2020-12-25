@@ -11,9 +11,11 @@ beautifulsoup4 = "^4.9.3"
 html2markdown = "^0.1.7"
 pypandoc = "^1.5"
 python-dotenv = "^0.15.0"
+numpy = "^1.19.4"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.19.0"
+mypy = "^0.790"
 
 [build-system]
 requires = ["poetry>=0.12"]
