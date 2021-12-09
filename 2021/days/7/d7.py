@@ -8,10 +8,10 @@ I = parse_input()
 def calc_min_fuel(calc_fuel):
     min_fuel = math.inf
     for pos in range(min(I), max(I) + 1):
-        test_min_fuel = calc_fuel(pos)
+        min_fuel_for_pos = calc_fuel(pos)
 
-        if test_min_fuel < min_fuel:
-            min_fuel = test_min_fuel
+        if min_fuel_for_pos < min_fuel:
+            min_fuel = min_fuel_for_pos
     return min_fuel
 
 def calc_fuel_p1(pos):
