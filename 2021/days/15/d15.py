@@ -1,5 +1,6 @@
 import math
 from typing import NamedTuple
+import heapq
 
 
 class Coords(NamedTuple):
@@ -24,7 +25,7 @@ neighbor_edges = {Coords(-1, 0), Coords(0, -1)}
 
 
 def main():
-    risk_coords, tile_width, tile_height = parse_input('./test')
+    risk_coords, tile_width, tile_height = parse_input()
     num_tiles_x = 5
     num_tiles_y = 5
 
@@ -37,139 +38,33 @@ def main():
     print(total_risk)
 
 
-# noinspection DuplicatedCode
-class PriorityQueue:
-
-    def __init__(self, starting_elts):
-        self.tree = {}
-        self.dist_map = {}
-        self.processed = set()
-        for node_id, priority in starting_elts:
-            self.push(node_id, priority)
-
-    def empty(self):
-        return len(self.processed) == len(self.dist_map)
-
-    def remove_id(self, node_id, node, parent):
-        node['ids'].remove(node_id)
-        self.processed.add(node_id)
-        if not node['ids']:
-            self.delete_node(node, parent)
-
-    def modify_priority(self, node_id, new_priority):
-        prev_priority = self.dist_map[node_id]
-        parent = None
-        curr_node = self.tree
-        while True:
-            if curr_node['priority'] == prev_priority:
-                self.remove_id(node_id, curr_node, parent)
-                break
-            parent = curr_node
-            if curr_node['priority'] < prev_priority:
-                curr_node = curr_node['less']
-            if curr_node['priority'] > prev_priority:
-                curr_node = curr_node['more']
-
-        self.push(node_id, new_priority)
-
-    def push(self, node_id, priority):
-        self.dist_map[node_id] = priority
-        num_left = (len(self.dist_map) - len(self.processed))
-        if num_left % 1000 == 0:
-            print(f'dist_map={num_left}')
-        curr_node = self.tree
-        if 'priority' not in curr_node:
-            curr_node['priority'] = priority
-            curr_node['ids'] = []
-        while True:
-            if curr_node['priority'] == priority:
-                curr_node['ids'].append(node_id)
-                break
-            if curr_node['priority'] > priority:
-                if 'less' not in curr_node:
-                    next_node = {'priority': priority, 'ids': []}
-                    curr_node['less'] = next_node
-                else:
-                    next_node = curr_node['less']
-            if curr_node['priority'] < priority:
-                if 'more' not in curr_node:
-                    next_node = {'priority': priority, 'ids': []}
-                    curr_node['more'] = next_node
-                else:
-                    next_node = curr_node['more']
-            curr_node = next_node
-
-    def delete_node(self, node_to_delete, parent):
-        children = []
-        if 'less' in node_to_delete:
-            children.append(node_to_delete['less'])
-        if 'more' in node_to_delete:
-            children.append(node_to_delete['more'])
-
-        if len(children) == 2:
-            new_node, new_child = sorted(children,
-                                         key=lambda child: math.abs(child['priority'] - node_to_delete['priority']))
-            if node_to_delete['less'] == new_node:
-                c_node = new_node
-                while 'more' in c_node:
-                    c_node = c_node['more']
-                c_node['more'] = new_child
-            else:
-                c_node = new_node
-                while 'less' in c_node:
-                    c_node = c_node['less']
-                c_node['less'] = new_child
-
-        if len(children) == 1:
-            new_node = children[0]
-
-        if parent:
-            if len(children) == 0:
-                del parent['less']
-            else:
-                parent['less'] = new_node
-        else:
-            if len(children) == 0:
-                self.tree = {}
-            else:
-                self.tree = new_node
-
-    def pop_min(self):
-        parent = None
-        curr_node = self.tree
-        while 'less' in curr_node:
-            parent = curr_node
-            curr_node = curr_node['less']
-
-        node_id = curr_node['ids'][0]
-        self.remove_id(node_id, curr_node, parent)
-
-        return node_id
-
-
 def dijkstra(vertexes, source, destination):
-    dists = {k: math.inf for k in vertexes.keys()}
-
     # starting node guaranteed to be smallest
-    dists[source.id] = 0
-    queue = PriorityQueue([*dists.items()])
-    while not queue.empty():
-        current_node = vertexes[queue.pop_min()]
+    processed = {}
+    queue = [(math.inf, key) for key in vertexes.keys()]
+    queue.insert(0, (0, source.id))
+    heapq.heapify(queue)
+    dists = {k: v for v, k in queue}
+    while queue:
+        curr_node_dist, vtx_id = heapq.heappop(queue)
+        current_node = vertexes[vtx_id]
+        processed[vtx_id] = curr_node_dist
 
         for weight, neighbor in current_node.edges:
-            if neighbor.id in queue.processed:
+            if neighbor.id in processed:
                 continue
-            curr_neighbor_dist = queue.dist_map[neighbor.id]
-            new_dist = queue.dist_map[current_node.id] + weight
+            neighbor_dist = dists[neighbor.id]
+            new_dist = curr_node_dist + weight
+            if new_dist < neighbor_dist:
+                dists[neighbor.id] = new_dist
+                heapq.heappush(queue, (new_dist, neighbor.id))
 
-            if new_dist < curr_neighbor_dist:
-                queue.modify_priority(neighbor.id, new_dist)
-
-            if destination.id in queue.processed:
-                return queue.dist_map[destination.id]
+        if destination.id in processed:
+            return processed[destination.id]
     raise "destination not in vertexes"
 
 
+# we could do a straight coords lookup instead of creating this graph
 def get_graph(risk_coords, tile_height, tile_width, num_tiles_x, num_tiles_y):
     vertexes = {}
 
