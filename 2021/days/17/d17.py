@@ -21,6 +21,7 @@ v0 = root(d, 0 + 1) - root(sum(-n for n in range(x+1), x+1)
 
 """
 import math
+from collections import defaultdict
 from typing import NamedTuple
 import re
 
@@ -39,17 +40,50 @@ class Point(NamedTuple):
     y: int
 
 
-target_pos: TargetPosition = None
-
-
-
-
 def p1():
-    global target_pos
     target_pos = parse_input()
 
+    # use equation for sum of naturals
     highest_pos_vel = ((target_pos.y1 + 1) * target_pos.y1 // 2)
     print(highest_pos_vel)
+
+
+def p2():
+    target_pos = parse_input()
+    v, n = 0, int((target_pos.x1 * 2) ** 0.5 - 1)  # n-th member of arithmetic progression
+
+    dxs = defaultdict(set)
+    for dx_init in range(n, target_pos.x2 + 1):
+        x, dx, step = 0, dx_init, 0
+        while x <= target_pos.x2 and (dx == 0 and target_pos.x1 <= x or dx != 0):
+            x += dx
+            if dx > 0: dx -= 1
+            step += 1
+            if target_pos.x1 <= x <= target_pos.x2:
+                dxs[dx_init].add(step)
+                if dx == 0:
+                    dxs[dx_init] = min(dxs[dx_init])
+                    break
+
+    dys = defaultdict(set)
+    for dy_init in range(target_pos.y1, -target_pos.y1):
+        y, dy, step = 0, dy_init, 0
+        while target_pos.y1 <= y:
+            y += dy
+            dy -= 1
+            step += 1
+            if target_pos.y1 <= y <= target_pos.y2:
+                dys[dy_init].add(step)
+
+    for xsteps in dxs.values():
+        for ysteps in dys.values():
+            if type(xsteps) is int:
+                if xsteps <= max(ysteps):
+                    v += 1
+            elif xsteps & ysteps:
+                v += 1
+
+    print(v)
 
 
 def parse_input():
@@ -71,3 +105,4 @@ def parse_input():
 
 if __name__ == '__main__':
     p1()
+    p2()
