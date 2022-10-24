@@ -45,27 +45,27 @@ examples = [
 
 def main():
     global str_rep, pointer
-    for example in examples:
-        pointer = 0
-        str_rep = bin(int(example, 16))[2:].zfill(len(example) * 4)
+    example = parse_input()
 
-        oft_disp = ''
-        hex_disp = ''
-        bin_disp = ''
-        for i in range(0, len(example)):
-            oft_disp += str(i).ljust(4, ' ') + ' '
-            hex_disp += example[i].ljust(4, ' ') + ' '
-            bin_disp += str_rep[i * 4: i * 4 + 4] + ' '
-        print(oft_disp)
-        print(hex_disp)
-        print(bin_disp)
+    pointer = 0
+    str_rep = example
 
-        root_packet = parse_packet()
-        print(root_packet)
-        packets = [p for p in yield_all_packets(root_packet)]
-        sum_versions = sum(p.header.version for p in packets)
-        print(sum_versions)
-        print()
+    oft_disp = ''
+    hex_disp = ''
+    bin_disp = ''
+    for i in range(0, len(example)):
+        oft_disp += str(i).ljust(4, ' ') + ' '
+        hex_disp += example[i].ljust(4, ' ') + ' '
+        bin_disp += str_rep[i * 4: i * 4 + 4] + ' '
+    print(oft_disp)
+    print(hex_disp)
+    print(bin_disp)
+
+    root_packet = parse_packet()
+    packets = [p for p in yield_all_packets(root_packet)]
+    sum_versions = sum(p.header.version for p in packets)
+    print(sum_versions)
+    print()
 
 
 def yield_all_packets(packet):
@@ -137,38 +137,11 @@ def parse_segment(segment):
     return value
 
 
-def test():
-    inputA = int('0101', 2)
-    print("Before shifting " + str(inputA) + " " + bin(inputA))
-    print("After shifting in binary: " + bin(inputA << 1))
-    print("After shifting in decimal: " + str(inputA << 1))
-
-
-conv_table = {
-    "0": "0000",
-    "1": "0001",
-    "2": "0010",
-    "3": "0011",
-    "4": "0100",
-    "5": "0101",
-    "6": "0110",
-    "7": "0111",
-    "8": "1000",
-    "9": "1001",
-    "A": "1010",
-    "B": "1011",
-    "C": "1100",
-    "D": "1101",
-    "E": "1110",
-    "F": "1111"
-}
-
-
 def parse_input(path='./input'):
-    return example3_operator
     with open(path) as f:
-        text = f.read()
-    return str(bin(int(example1, 16)))[2:]
+        text = f.read().strip()
+
+    return bin(int(text, 16))[2:].zfill(len(text) * 4)
 
 
 if __name__ == '__main__':
