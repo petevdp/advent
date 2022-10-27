@@ -13,6 +13,7 @@ requests = "^2.26.0"
 beautifulsoup4 = "^4.10.0"
 pypandoc = "^1.6.4"
 html2markdown = "^0.1.7"
+typing-extensions = "^4.4.0"
 
 [tool.poetry.dev-dependencies]
 
