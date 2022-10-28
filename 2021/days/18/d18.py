@@ -11,6 +11,9 @@ from typing_extensions import Self
 
 @dataclass
 class RegNum:
+    '''
+    Bidirectional Linked list
+    '''
     value: int
     prev: Self = None
     next: Self = None
@@ -70,6 +73,9 @@ class RegNum:
 
 @dataclass
 class Pair:
+    """
+    tree node, leafs are RegNums
+    """
     depth: int
     left: Union[RegNum, Self] = None
     right: Union[RegNum, Self] = None

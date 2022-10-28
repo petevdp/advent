@@ -14,6 +14,8 @@ beautifulsoup4 = "^4.10.0"
 pypandoc = "^1.6.4"
 html2markdown = "^0.1.7"
 typing-extensions = "^4.4.0"
+sparse = "^0.13.0"
+matplotlib = "^3.6.1"
 
 [tool.poetry.dev-dependencies]
 
