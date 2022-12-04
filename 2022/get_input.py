@@ -17,3 +17,6 @@ input_path = f'days/{day}/input'
 with open(input_path, 'w+') as f:
     print(f'writing input to {input_path}')
     f.write(r.text)
+script_path = f'days/{day}/d{day}.py'
+with open(script_path, 'w+') as f:
+    f.write("with open('input') as f:\n    pass")
