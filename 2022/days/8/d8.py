@@ -1,6 +1,3 @@
-from itertools import product
-import numpy as np
-
 with open('input') as f:
     trees = [[int(t) for t in list(l.strip())] for l in f]
 
