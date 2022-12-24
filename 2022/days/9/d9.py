@@ -20,12 +20,19 @@ def get_input():
                         yield delta, 0
 
 
-def print_rope(size=(6, 6)):
-    board = [["." for _ in range(size[0])] for _ in range(size[1])]
+def print_rope(rope, size=24):
+    board = [["." for _ in range((size * 2) + 1)] for _ in range((size * 2) + 1)]
 
-    board[0][0] = "s"
-    board[tail_pos[1]][tail_pos[0]] = "T"
-    board[head_pos[1]][head_pos[0]] = "H"
+    def offset(idx):
+        return idx + size
+
+    board[offset(0)][offset(0)] = "s"
+    for i, seg in reversed([*enumerate(rope)]):
+        if i == 0:
+            char = "H"
+        else:
+            char = str(i)
+        board[offset(seg[1])][offset(seg[0])] = char
 
     print("\n".join([*reversed(["".join(r) for r in board])]))
 
@@ -39,13 +46,7 @@ def adjacent(coords):
         yield apply_delta(coords, delta)
 
 
-tail_pos = head_pos = (0, 0)
-visited = {tail_pos}
-
-print(f"{head_pos=}")
-for i, move in enumerate(get_input()):
-    head_pos = apply_delta(head_pos, move)
-
+def sim_segment(head_pos, tail_pos):
     if head_pos == tail_pos or tail_pos in adjacent(head_pos):
         pass
     elif head_pos[0] != tail_pos[0] and head_pos[1] != tail_pos[1]:
@@ -54,7 +55,7 @@ for i, move in enumerate(get_input()):
         delta = dx // abs(dx), dy // abs(dy)
         tail_pos = apply_delta(tail_pos, delta)
     else:
-        for dim, opp_dim in ((0, 1), (1,0)):
+        for dim, opp_dim in ((0, 1), (1, 0)):
             if head_pos[opp_dim] != tail_pos[opp_dim] or head_pos[dim] == tail_pos[dim]:
                 continue
             if head_pos[opp_dim] == tail_pos[opp_dim] and abs(head_pos[dim] - tail_pos[dim]) == 2:
@@ -63,14 +64,25 @@ for i, move in enumerate(get_input()):
                 delta[dim] = delta_d // abs(delta_d)
                 tail_pos = apply_delta(tail_pos, delta)
                 break
-
-    visited.add(tail_pos)
-    # print(i)
-    # print(f"{move=}")
-    # print(f"{head_pos=}")
-    # print(f"{tail_pos=}")
-    # print_rope()
-    # print('\n')
+    return tail_pos
 
 
-print("p1:", len(visited))
+rope = [(0, 0) for i in range(10)]
+visited_p2 = {(0, 0)}
+visited_p1 = {(0, 0)}
+# print_rope(rope)
+print()
+for epoch, move in enumerate(get_input()):
+    rope[0] = apply_delta(rope[0], move)
+    for i in range(1, len(rope)):
+        dt = sim_segment(rope[i - 1], rope[i])
+        rope[i] = dt
+
+    visited_p2.add(rope[-1])
+    visited_p1.add(rope[1])
+    # print(epoch)
+    # print_rope(rope)
+    # print()
+
+print("p1:", len(visited_p1))
+print("p2:", len(visited_p2))
