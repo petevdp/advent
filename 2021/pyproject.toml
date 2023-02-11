@@ -6,7 +6,7 @@ authors = ["Pieter Vanderpol <pjvanderpol@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-ipython = "^7.30.0"
+ipython = "^8.10.0"
 pandas = "^1.3.4"
 python-dotenv = "^0.19.2"
 requests = "^2.26.0"
