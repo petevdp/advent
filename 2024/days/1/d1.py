@@ -1,7 +1,9 @@
 from collections import defaultdict
+import sys
 L = []
 R = []
-with open('days/1/input_d1.txt') as f:
+
+with open(sys.argv[1]) as f:
     for line in f:
         l, r = map(int, line.strip().split())
         L.append(l)

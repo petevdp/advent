@@ -1,5 +1,6 @@
+import sys
 R = []
-with open('days/2/input_d2.txt') as f:
+with open(sys.argv[1]) as f:
     for line in f:
         R.append(list(map(int, line.strip().split())))
 

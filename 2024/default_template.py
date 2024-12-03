@@ -1,8 +1,8 @@
 import sys
 
-input_file =  len(sys.argv) > 1 and sys.argv[1] or 'input'
+input_file = sys.argv[1]
 
-with open(f'./days/{{day}}/{input}.txt') as f:
+with open(input_file) as f:
     pass
 
 def part1():
